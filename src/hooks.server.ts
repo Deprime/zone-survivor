@@ -1,6 +1,7 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { SESSION_COOKIE, SESSION_TTL, getSessionUserId } from '$lib/server/auth/session';
 import { getUserById } from '$lib/server/users';
+import { initHawk, reportError } from '$lib/server/hawk';
 import {
 	startDeathDigestJob,
 	startDeathSweeper,
@@ -10,11 +11,28 @@ import {
 import { startNotificationWorker } from '$lib/server/notifications/worker';
 
 // Запускаются один раз при старте сервера.
+initHawk();
 startDeathSweeper();
 startLeaderboardRefresher();
 startSeasonWatcher();
 startDeathDigestJob();
 startNotificationWorker();
+
+/**
+ * Ловит все НЕОЖИДАННЫЕ ошибки серверных load/action/endpoint (в т.ч. колбэка
+ * авторизации) и отправляет их в Hawk. Ожидаемые `error(4xx/5xx)` сюда не попадают.
+ */
+export const handleError: HandleServerError = ({ error, event, status }) => {
+	reportError(error, {
+		path: event.url.pathname,
+		method: event.request.method,
+		status,
+		userId: event.locals.user?.id ?? null
+	});
+	console.error(`[error] ${status} ${event.url.pathname}:`, error);
+
+	return { message: 'Внутренняя ошибка сервера. Мы уже разбираемся.' };
+};
 
 export const handle: Handle = async ({ event, resolve }) => {
 	// Реферальная ссылка: ?ref=<uuid> — запоминаем в cookie до регистрации.
@@ -39,6 +57,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 		} catch (err) {
 			console.error('Не удалось загрузить сессию:', err);
+			reportError(err, { where: 'session-load' });
 		}
 	}
 

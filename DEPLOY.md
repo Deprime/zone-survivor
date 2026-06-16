@@ -52,6 +52,7 @@ git push
 | `PLATEGA_MERCHANT_ID`     | ваш MerchantId                                                         |
 | `PLATEGA_SECRET`          | ваш API-ключ                                                           |
 | `PLATEGA_METHOD`          | `2` (СБП QR)                                                           |
+| `HAWK_TOKEN`              | Integration Token проекта Hawk (логгер ошибок); пусто — выключено      |
 
 > Точные имена переменных у плагинов проверьте в их вкладке Variables (`MYSQL_URL`, `REDIS_URL`). При необходимости подставьте фактические.
 

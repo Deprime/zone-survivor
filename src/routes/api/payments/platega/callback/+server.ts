@@ -1,6 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 import { verifyCallbackAuth } from '$lib/server/payments/platega';
 import { handleCallback, type PlategaCallback } from '$lib/server/payments/service';
+import { reportError } from '$lib/server/hawk';
 import type { RequestHandler } from './$types';
 
 /**
@@ -24,6 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		await handleCallback(body);
 	} catch (err) {
 		console.error('[pay] ошибка обработки callback:', err);
+		reportError(err, { where: 'platega-callback', txId: body.id });
 	}
 
 	return json({ ok: true });

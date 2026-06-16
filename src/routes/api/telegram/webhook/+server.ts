@@ -1,6 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { handleUpdate, type TelegramUpdate } from '$lib/server/bot';
+import { reportError } from '$lib/server/hawk';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -22,6 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		await handleUpdate(update);
 	} catch (err) {
 		console.error('[bot] ошибка обработки апдейта:', err);
+		reportError(err, { where: 'telegram-webhook' });
 	}
 
 	return json({ ok: true });

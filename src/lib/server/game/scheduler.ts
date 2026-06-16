@@ -9,6 +9,7 @@ import { sweepDeaths } from './sweep';
 import { refreshLeaderboard } from './leaderboard';
 import { endSeasonIfDue, getActiveSeason } from './season';
 import { sendDeathDigest } from './digest';
+import { reportError } from '$lib/server/hawk';
 
 const globalForSweeper = globalThis as unknown as {
 	__deathSweeperStarted?: boolean;
@@ -42,6 +43,7 @@ export function startDeathSweeper(): void {
 			if (dead > 0) console.log(`[sweep] зафиксировано смертей: ${dead}`);
 		} catch (err) {
 			console.error('[sweep] ошибка прохода:', err);
+			reportError(err, { job: 'sweep' });
 		}
 	};
 
@@ -73,6 +75,7 @@ export function startLeaderboardRefresher(): void {
 			await refreshLeaderboard();
 		} catch (err) {
 			console.error('[leaderboard] ошибка обновления:', err);
+			reportError(err, { job: 'leaderboard' });
 		}
 	};
 
@@ -106,6 +109,7 @@ export function startSeasonWatcher(): void {
 			if (ended) console.log(`[season] сезон ${ended} завершён, начат новый`);
 		} catch (err) {
 			console.error('[season] ошибка:', err);
+			reportError(err, { job: 'season' });
 		}
 	};
 
@@ -140,6 +144,7 @@ export function startDeathDigestJob(): void {
 			}
 		} catch (err) {
 			console.error('[digest] ошибка отправки:', err);
+			reportError(err, { job: 'death-digest' });
 		}
 	};
 

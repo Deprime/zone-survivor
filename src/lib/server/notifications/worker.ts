@@ -3,6 +3,7 @@ import { HTTPError } from 'ky';
 import { PUBLIC_SITE_URL } from '$env/static/public';
 import { getUserById } from '$lib/server/users';
 import { sendDirectMessage } from '$lib/server/telegram';
+import { reportError } from '$lib/server/hawk';
 import { NOTIFY_QUEUE, bullConnection, type NotificationJob } from './queue';
 
 const globalForWorker = globalThis as unknown as { __notifyWorkerStarted?: boolean };
@@ -78,5 +79,6 @@ export function startNotificationWorker(): void {
 
 	worker.on('failed', (job, err) => {
 		console.error(`[notify] задача ${job?.id} (${job?.name}) упала:`, err.message);
+		reportError(err, { where: 'notify-worker', jobName: job?.name });
 	});
 }
