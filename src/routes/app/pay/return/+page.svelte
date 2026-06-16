@@ -5,6 +5,7 @@
 	let { data } = $props();
 
 	const FINAL = ['confirmed', 'canceled', 'chargebacked'];
+	// svelte-ignore state_referenced_locally
 	let status = $state(data.payment?.status ?? 'unknown');
 
 	onMount(() => {
@@ -38,7 +39,9 @@
 	{#if !data.payment}
 		<div class="mb-3 text-4xl" aria-hidden="true">❓</div>
 		<h1 class="mb-3 text-xl">Платёж не найден</h1>
-		<a href="/app/game" class="pixel-btn pixel-btn--outline pixel-btn--md mt-4 inline-block">В игру</a>
+		<a href="/app/game" class="pixel-btn pixel-btn--outline pixel-btn--md mt-4 inline-block"
+			>В игру</a
+		>
 	{:else if status === 'confirmed'}
 		<div class="mb-3 text-4xl" aria-hidden="true">✅</div>
 		<h1 class="text-amber mb-3 text-xl sm:text-2xl">Оплата прошла!</h1>

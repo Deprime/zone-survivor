@@ -1,7 +1,14 @@
 import { and, desc, eq, isNull, lte } from 'drizzle-orm';
 import { PUBLIC_SEASON_START } from '$env/static/public';
 import { db } from '$lib/server/db';
-import { graves, inventoryItems, seasonWinners, seasons, users, type Season } from '$lib/server/db/schema';
+import {
+	graves,
+	inventoryItems,
+	seasonWinners,
+	seasons,
+	users,
+	type Season
+} from '$lib/server/db/schema';
 import { redis } from '$lib/server/redis';
 import {
 	LEADERBOARD_PRIZE_TOP,
@@ -136,7 +143,10 @@ export interface WinnerRow {
 }
 
 /** Победители последнего завершённого сезона (для отображения). */
-export async function getLatestWinners(): Promise<{ seasonId: number; winners: WinnerRow[] } | null> {
+export async function getLatestWinners(): Promise<{
+	seasonId: number;
+	winners: WinnerRow[];
+} | null> {
 	const [last] = await db
 		.select()
 		.from(seasons)

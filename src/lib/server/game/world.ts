@@ -63,9 +63,10 @@ export async function consumeOneItem(userId: number, itemKey: DropItemId): Promi
 }
 
 // Предметы, которые реально можно найти (dropChance > 0).
-const DROPPABLE = Object.entries(DROP).filter(
-	([, item]) => item.dropChance > 0
-) as [DropItemId, (typeof DROP)[DropItemId]][];
+const DROPPABLE = Object.entries(DROP).filter(([, item]) => item.dropChance > 0) as [
+	DropItemId,
+	(typeof DROP)[DropItemId]
+][];
 
 /**
  * Разрешает событие на клетке (модель «бросок при входе»).
@@ -85,7 +86,9 @@ export async function resolveCellEvent(opts: {
 	const [grave] = await db
 		.select()
 		.from(graves)
-		.where(and(eq(graves.x, x), eq(graves.y, y), eq(graves.looted, false), ne(graves.userId, userId)))
+		.where(
+			and(eq(graves.x, x), eq(graves.y, y), eq(graves.looted, false), ne(graves.userId, userId))
+		)
 		.limit(1);
 
 	if (grave) {

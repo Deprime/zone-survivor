@@ -13,7 +13,9 @@ function gameLink(): string {
 }
 
 /** Готовит адресата и текст; null — задача устарела (пропустить). */
-async function resolve(job: Job<NotificationJob>): Promise<{ chatId: number; text: string } | null> {
+async function resolve(
+	job: Job<NotificationJob>
+): Promise<{ chatId: number; text: string } | null> {
 	const data = job.data;
 	switch (data.type) {
 		case 'bite':

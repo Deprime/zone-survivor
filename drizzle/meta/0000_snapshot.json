@@ -1,0 +1,583 @@
+{
+	"version": "5",
+	"dialect": "mysql",
+	"id": "bf22fcbf-e0ee-44c9-acbc-2a7f3d027508",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"tables": {
+		"graves": {
+			"name": "graves",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"x": {
+					"name": "x",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"y": {
+					"name": "y",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"tokens": {
+					"name": "tokens",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"looted": {
+					"name": "looted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"inscription": {
+					"name": "inscription",
+					"type": "varchar(140)",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(now())"
+				}
+			},
+			"indexes": {
+				"idx_graves_xy": {
+					"name": "idx_graves_xy",
+					"columns": ["x", "y"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"graves_user_id_users_id_fk": {
+					"name": "graves_user_id_users_id_fk",
+					"tableFrom": "graves",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"graves_id": {
+					"name": "graves_id",
+					"columns": ["id"]
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraint": {}
+		},
+		"inventory_items": {
+			"name": "inventory_items",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"item_key": {
+					"name": "item_key",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(now())"
+				}
+			},
+			"indexes": {
+				"idx_inventory_user_id": {
+					"name": "idx_inventory_user_id",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"inventory_items_user_id_users_id_fk": {
+					"name": "inventory_items_user_id_users_id_fk",
+					"tableFrom": "inventory_items",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"inventory_items_id": {
+					"name": "inventory_items_id",
+					"columns": ["id"]
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraint": {}
+		},
+		"payments": {
+			"name": "payments",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"purpose": {
+					"name": "purpose",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"amount_rub": {
+					"name": "amount_rub",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'pending'"
+				},
+				"provider_tx_id": {
+					"name": "provider_tx_id",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(now())"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"onUpdate": true,
+					"default": "(now())"
+				}
+			},
+			"indexes": {
+				"idx_payments_user_id": {
+					"name": "idx_payments_user_id",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"idx_payments_tx": {
+					"name": "idx_payments_tx",
+					"columns": ["provider_tx_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"payments_user_id_users_id_fk": {
+					"name": "payments_user_id_users_id_fk",
+					"tableFrom": "payments",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"payments_id": {
+					"name": "payments_id",
+					"columns": ["id"]
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraint": {}
+		},
+		"season_winners": {
+			"name": "season_winners",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"season_id": {
+					"name": "season_id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"rank": {
+					"name": "rank",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"tokens": {
+					"name": "tokens",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"prize": {
+					"name": "prize",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(now())"
+				}
+			},
+			"indexes": {
+				"idx_season_winners_season": {
+					"name": "idx_season_winners_season",
+					"columns": ["season_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"season_winners_season_id_seasons_id_fk": {
+					"name": "season_winners_season_id_seasons_id_fk",
+					"tableFrom": "season_winners",
+					"tableTo": "seasons",
+					"columnsFrom": ["season_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"season_winners_user_id_users_id_fk": {
+					"name": "season_winners_user_id_users_id_fk",
+					"tableFrom": "season_winners",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"season_winners_id": {
+					"name": "season_winners_id",
+					"columns": ["id"]
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraint": {}
+		},
+		"seasons": {
+			"name": "seasons",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"starts_at": {
+					"name": "starts_at",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"ends_at": {
+					"name": "ends_at",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'active'"
+				},
+				"finished_at": {
+					"name": "finished_at",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(now())"
+				}
+			},
+			"indexes": {
+				"idx_seasons_status": {
+					"name": "idx_seasons_status",
+					"columns": ["status"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {
+				"seasons_id": {
+					"name": "seasons_id",
+					"columns": ["id"]
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraint": {}
+		},
+		"users": {
+			"name": "users",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"uuid": {
+					"name": "uuid",
+					"type": "varchar(36)",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"telegram_id": {
+					"name": "telegram_id",
+					"type": "bigint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"chat_id": {
+					"name": "chat_id",
+					"type": "bigint",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"username": {
+					"name": "username",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"parent_id": {
+					"name": "parent_id",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"tokens": {
+					"name": "tokens",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"active_at": {
+					"name": "active_at",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"died_at": {
+					"name": "died_at",
+					"type": "int unsigned",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"inventory_size": {
+					"name": "inventory_size",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 4
+				},
+				"pos_x": {
+					"name": "pos_x",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 64
+				},
+				"pos_y": {
+					"name": "pos_y",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 64
+				},
+				"bite_moves_left": {
+					"name": "bite_moves_left",
+					"type": "smallint unsigned",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"zombie_week": {
+					"name": "zombie_week",
+					"type": "varchar(8)",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(now())"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"onUpdate": true,
+					"default": "(now())"
+				}
+			},
+			"indexes": {
+				"idx_users_chat_id": {
+					"name": "idx_users_chat_id",
+					"columns": ["chat_id"],
+					"isUnique": false
+				},
+				"idx_users_parent_id": {
+					"name": "idx_users_parent_id",
+					"columns": ["parent_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"users_parent_id_users_id_fk": {
+					"name": "users_parent_id_users_id_fk",
+					"tableFrom": "users",
+					"tableTo": "users",
+					"columnsFrom": ["parent_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"users_id": {
+					"name": "users_id",
+					"columns": ["id"]
+				}
+			},
+			"uniqueConstraints": {
+				"users_uuid_unique": {
+					"name": "users_uuid_unique",
+					"columns": ["uuid"]
+				},
+				"users_telegram_id_unique": {
+					"name": "users_telegram_id_unique",
+					"columns": ["telegram_id"]
+				}
+			},
+			"checkConstraint": {}
+		}
+	},
+	"views": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	},
+	"internal": {
+		"tables": {},
+		"indexes": {}
+	}
+}

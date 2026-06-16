@@ -48,10 +48,7 @@ function getQueue(): Queue<NotificationJob> {
 }
 
 /** Кладёт уведомление в очередь. Ошибки очереди не должны ломать игровую логику. */
-export async function enqueueNotification(
-	job: NotificationJob,
-	opts?: JobsOptions
-): Promise<void> {
+export async function enqueueNotification(job: NotificationJob, opts?: JobsOptions): Promise<void> {
 	try {
 		await getQueue().add(job.type, job, opts);
 	} catch (err) {

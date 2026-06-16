@@ -19,10 +19,7 @@ export async function applyReferralReward(parentId: number): Promise<void> {
 		.where(eq(users.id, parentId));
 
 	// Сколько всего рефералов привёл этот пользователь.
-	const [row] = await db
-		.select({ value: count() })
-		.from(users)
-		.where(eq(users.parentId, parentId));
+	const [row] = await db.select({ value: count() }).from(users).where(eq(users.parentId, parentId));
 	const referralCount = Number(row?.value ?? 0);
 
 	// Ровно на 10-м реферале — выдаём крест один раз.

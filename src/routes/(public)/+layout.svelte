@@ -109,7 +109,8 @@
 
 	<footer class="border-border text-muted border-t-2 px-4 py-6 text-center text-xs">
 		<p>
-			© {year} {siteName}. Все права защищены.
+			© {year}
+			{siteName}. Все права защищены.
 		</p>
 		<p class="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
 			<a href="/rules">Правила</a>

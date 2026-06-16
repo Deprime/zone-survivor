@@ -149,7 +149,9 @@
 			{#if data.death && nowSec < data.death.windowEndsAt}
 				<p class="text-muted mt-2 text-xs">
 					Окно действий ещё открыто:
-					<span class="text-cyan tabular-nums">{fmt(Math.max(0, data.death.windowEndsAt - nowSec))}</span>
+					<span class="text-cyan tabular-nums"
+						>{fmt(Math.max(0, data.death.windowEndsAt - nowSec))}</span
+					>
 				</p>
 
 				<!-- надпись на надгробии -->
@@ -163,7 +165,8 @@
 						rows="2"
 						maxlength={GRAVE_INSCRIPTION_MAX}
 						class="border-border bg-bg text-fg w-full border-2 px-2 py-1 text-sm"
-						placeholder="Последние слова…">{data.death.inscription ?? ''}</textarea>
+						placeholder="Последние слова…">{data.death.inscription ?? ''}</textarea
+					>
 					<div class="mt-2 flex items-center gap-3">
 						<button type="submit" class="pixel-btn pixel-btn--outline pixel-btn--sm">
 							Сохранить

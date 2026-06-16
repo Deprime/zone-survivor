@@ -16,6 +16,7 @@
 		children: Snippet;
 	} & Omit<HTMLAnchorAttributes & HTMLButtonAttributes, 'class'>;
 
+	// svelte-ignore custom_element_props_identifier
 	let {
 		variant = 'outline',
 		size = 'md',
@@ -25,7 +26,7 @@
 		...rest
 	}: Props = $props();
 
-	const classes = `pixel-btn pixel-btn--${variant} pixel-btn--${size} ${className}`;
+	const classes = $derived(`pixel-btn pixel-btn--${variant} pixel-btn--${size} ${className}`);
 </script>
 
 {#if href}

@@ -15,7 +15,9 @@
 	role="img"
 	aria-label="ZombieLand survivor"
 >
-	<pre class="logo__art" aria-hidden="true">#####  ###  #   # ####  ##### ##### #      ###  #   # ####
+	<pre
+		class="logo__art"
+		aria-hidden="true">#####  ###  #   # ####  ##### ##### #      ###  #   # ####
    ## #   # ## ## #   #   #   #     #     #   # ##  # #   #
   ##  #   # # # # ####    #   ####  #     ##### # # # #   #
 ##    #   # #   # #   #   #   #     #     #   # #  ## #   #

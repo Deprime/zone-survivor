@@ -178,5 +178,12 @@ export async function pressAlive(userId: number): Promise<PressResult> {
 		/* Redis-кэш некритичен */
 	}
 
-	return { ok: true, x: next.x, y: next.y, tokens: finalTokens, event, threat: threatOutcome.threat };
+	return {
+		ok: true,
+		x: next.x,
+		y: next.y,
+		tokens: finalTokens,
+		event,
+		threat: threatOutcome.threat
+	};
 }

@@ -13,9 +13,7 @@
 
 	// Клеток не меньше размера инвентаря и не меньше числа предметов.
 	const totalCells = $derived(Math.max(data.user.inventorySize, data.items.length));
-	const cells = $derived(
-		Array.from({ length: totalCells }, (_, i) => data.items[i] ?? null)
-	);
+	const cells = $derived(Array.from({ length: totalCells }, (_, i) => data.items[i] ?? null));
 </script>
 
 <svelte:head>

@@ -10,6 +10,7 @@
 		children: Snippet;
 	} & HTMLAttributes<HTMLElement>;
 
+	// svelte-ignore custom_element_props_identifier
 	let { element = 'div', class: className = '', children, ...rest }: Props = $props();
 </script>
 

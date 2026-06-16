@@ -12,8 +12,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	if (!secret) throw error(500, 'CRON_SECRET не задан');
 
 	const provided =
-		request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
-		url.searchParams.get('key');
+		request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? url.searchParams.get('key');
 	if (provided !== secret) throw error(401, 'Unauthorized');
 
 	const result = await sendDeathDigest();

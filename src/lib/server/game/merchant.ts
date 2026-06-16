@@ -39,7 +39,12 @@ export async function getMerchantState(user: User): Promise<MerchantState> {
 		inventorySize: user.inventorySize,
 		itemCount: items.length,
 		buy: BUYABLE.map((id) => ({ id, key: DROP[id].key, price: DROP[id].cost })),
-		sell: SELLABLE.map((id) => ({ id, key: DROP[id].key, price: DROP[id].cost, count: counts[id] ?? 0 }))
+		sell: SELLABLE.map((id) => ({
+			id,
+			key: DROP[id].key,
+			price: DROP[id].cost,
+			count: counts[id] ?? 0
+		}))
 	};
 }
 
@@ -47,7 +52,14 @@ export type TradeResult =
 	| { ok: true }
 	| {
 			ok: false;
-			reason: 'closed' | 'dead' | 'not_buyable' | 'not_sellable' | 'no_tokens' | 'no_space' | 'no_item';
+			reason:
+				| 'closed'
+				| 'dead'
+				| 'not_buyable'
+				| 'not_sellable'
+				| 'no_tokens'
+				| 'no_space'
+				| 'no_item';
 	  };
 
 /** Купить предмет за токены. */
@@ -59,7 +71,8 @@ export async function buyItem(user: User, itemId: string): Promise<TradeResult> 
 	const id = itemId as DropItemId;
 	const price = DROP[id].cost;
 
-	if ((await countInventory(user.id)) >= user.inventorySize) return { ok: false, reason: 'no_space' };
+	if ((await countInventory(user.id)) >= user.inventorySize)
+		return { ok: false, reason: 'no_space' };
 
 	// Списываем токены атомарно (guard по балансу), затем кладём предмет.
 	const raw = await db

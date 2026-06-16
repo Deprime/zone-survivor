@@ -37,6 +37,9 @@
 			availability: 'https://schema.org/InStock'
 		}
 	};
+	// Собираем строку <script> в JS-блоке; закрывающий тег разрываем через ${''},
+	// чтобы Svelte-компилятор не завершил <script>-блок раньше времени.
+	const jsonLdHtml = `<script type="application/ld+json">${JSON.stringify(jsonLd)}</${''}script>`;
 
 	const steps = [
 		{
@@ -96,7 +99,10 @@
 <svelte:head>
 	<title>{seoTitle}</title>
 	<meta name="description" content={seoDescription} />
-	<meta name="keywords" content="ZombieLand survivor, браузерная игра, зомби, выживание, 8-bit, онлайн игра, сезон, токены" />
+	<meta
+		name="keywords"
+		content="ZombieLand survivor, браузерная игра, зомби, выживание, 8-bit, онлайн игра, сезон, токены"
+	/>
 	<link rel="canonical" href={pageUrl} />
 
 	<!-- Open Graph -->
@@ -121,7 +127,8 @@
 	<meta name="twitter:image:alt" content="ZombieLand survivor — 8-bit игра на выживание" />
 
 	<!-- JSON-LD structured data -->
-	{@html `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`}
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+	{@html jsonLdHtml}
 </svelte:head>
 
 <!-- HERO -->
@@ -130,10 +137,11 @@
 	<h1 class="sr-only">ZombieLand survivor</h1>
 	<LogoChrome class="mx-auto mb-6" />
 	<p class="text-fg mx-auto mb-2 max-w-xl text-base sm:text-lg">
-		Каждые 24 часа жми кнопку <span class="text-amber">«Я жив»</span>.<br> Пропустил = погиб 🪦
+		Каждые 24 часа жми кнопку <span class="text-amber">«Я жив»</span>.<br /> Пропустил = погиб 🪦
 	</p>
 	<p class="text-muted mx-auto mb-8 max-w-xl text-sm">
-		Копи токены, исследуй мир, отбивайся от зомби и доживи до конца сезона, чтобы попасть в топ и получить призы!
+		Копи токены, исследуй мир, отбивайся от зомби и доживи до конца сезона, чтобы попасть в топ и
+		получить призы!
 	</p>
 	<Button href="/rules">Как играть</Button>
 </Card>
@@ -150,12 +158,12 @@
 	<div class="grid gap-6 sm:grid-cols-3">
 		{#each steps as step (step.n)}
 			<Card element="article" class="px-4 py-3 sm:p-5">
-				<div class="mb-2 flex items-center justify-between relative w-full">
+				<div class="relative mb-2 flex w-full items-center justify-between">
 					<div class="flex items-center gap-2">
 						<span class="text-3xl" aria-hidden="true">{step.icon}</span>
 						<h3 class="text-sm uppercase sm:text-sm">{step.title}</h3>
 					</div>
-					<span class="text-amber text-base font-extrabold absolute -top-4 -right-3">{step.n}</span>
+					<span class="text-amber absolute -top-4 -right-3 text-base font-extrabold">{step.n}</span>
 				</div>
 				<p class="text-muted text-sm leading-relaxed">{step.text}</p>
 			</Card>
@@ -238,7 +246,7 @@
 <Card element="section" class="mb-8 p-5 sm:mb-12 sm:p-7">
 	<div class="flex flex-col items-center">
 		<div class="mb-3 text-3xl" aria-hidden="true">💀</div>
-		<h2 class="mb-3 text-lg sm:text-xl text-center">Смерть даёт второй шанс</h2>
+		<h2 class="mb-3 text-center text-lg sm:text-xl">Смерть даёт второй шанс</h2>
 	</div>
 	<p class="text-muted text-sm leading-relaxed">
 		В течение 24 часов после гибели можно оставить прощальную надпись на надгробии — или воскресить

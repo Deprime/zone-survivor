@@ -29,7 +29,11 @@ export function quotePurchase(user: User, purpose: Purpose): Quote {
 		if (user.revivals >= MAX_REVIVALS) {
 			return { eligible: false, reason: 'Лимит воскрешений исчерпан.' };
 		}
-		return { eligible: true, amount: REVIVAL_PRICES_RUB[user.revivals], label: 'Воскрешение персонажа' };
+		return {
+			eligible: true,
+			amount: REVIVAL_PRICES_RUB[user.revivals],
+			label: 'Воскрешение персонажа'
+		};
 	}
 
 	// inventory
@@ -66,10 +70,7 @@ export async function startPayment(
 		payload: String(id)
 	});
 
-	await db
-		.update(payments)
-		.set({ providerTxId: created.transactionId })
-		.where(eq(payments.id, id));
+	await db.update(payments).set({ providerTxId: created.transactionId }).where(eq(payments.id, id));
 
 	return { redirect: created.redirect };
 }
@@ -129,7 +130,9 @@ export async function handleCallback(body: PlategaCallback): Promise<void> {
 	if (body.status === 'CONFIRMED') {
 		// Сверка суммы.
 		if (Math.round(body.amount) !== payment.amountRub) {
-			console.error(`[pay] сумма не совпала: ${body.amount} ≠ ${payment.amountRub} (id ${payment.id})`);
+			console.error(
+				`[pay] сумма не совпала: ${body.amount} ≠ ${payment.amountRub} (id ${payment.id})`
+			);
 			return;
 		}
 		// Идемпотентный переход pending → confirmed.

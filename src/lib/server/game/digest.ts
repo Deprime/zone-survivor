@@ -28,9 +28,7 @@ export async function buildDeathDigest(): Promise<{ text: string; count: number 
 	const shown = rows.slice(0, DEATH_DIGEST_MAX_ENTRIES);
 	const lines = shown.map((r) => {
 		const name = escapeHtml(r.name ?? `Выживший #${r.userId}`);
-		const epitaph = r.inscription
-			? `«${escapeHtml(r.inscription)}»`
-			: '<i>без эпитафии</i>';
+		const epitaph = r.inscription ? `«${escapeHtml(r.inscription)}»` : '<i>без эпитафии</i>';
 		return `🪦 <b>${name}</b> — ${epitaph}`;
 	});
 
