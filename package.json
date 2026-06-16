@@ -4,6 +4,9 @@
 	"description": "ZombieLand survivor — browser game website",
 	"private": true,
 	"type": "module",
+	"engines": {
+		"node": "22"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
