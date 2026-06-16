@@ -1,0 +1,78 @@
+/* ============================================================
+   Button — .pixel-btn (компонент Button.svelte)
+   Структура: базовый класс + модификаторы variant и size.
+   ============================================================ */
+@layer components {
+	/* 8bit button — shared structure (no color, no size here) */
+	.pixel-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		border: 2px solid transparent;
+		font-family: var(--font-pixel);
+		line-height: 1.2;
+		text-transform: uppercase;
+		font-weight: 400;
+		letter-spacing: 0.05em;
+		text-decoration: none;
+		transition:
+			box-shadow 0.18s ease,
+			background-color 0.18s ease,
+			color 0.18s ease;
+	}
+
+	.pixel-btn:hover {
+		text-decoration: none;
+	}
+
+	/* variant — colour only (outline: warm amber, solid: cyan) */
+	.pixel-btn--outline {
+		border-color: var(--color-amber);
+		background-color: transparent;
+		color: var(--color-amber);
+		box-shadow: 0 0 14px rgba(255, 138, 31, 0.25);
+	}
+
+	.pixel-btn--outline:hover {
+		background-color: var(--color-amber);
+		color: var(--color-bg);
+		box-shadow: 0 0 26px rgba(255, 138, 31, 0.55);
+	}
+
+	.pixel-btn--outline:active {
+		box-shadow: 0 0 12px rgba(255, 138, 31, 0.4);
+	}
+
+	.pixel-btn--solid {
+		border-color: var(--color-cyan);
+		background-color: var(--color-cyan);
+		color: var(--color-bg);
+		box-shadow: 0 0 22px rgba(52, 200, 192, 0.4);
+	}
+
+	.pixel-btn--solid:hover {
+		background-color: #4ad9d1;
+		box-shadow: 0 0 34px rgba(52, 200, 192, 0.7);
+	}
+
+	.pixel-btn--solid:active {
+		box-shadow: 0 0 16px rgba(52, 200, 192, 0.5);
+	}
+
+	/* size — padding + font-size only */
+	.pixel-btn--sm {
+		padding: 0.6rem 1.1rem;
+		font-size: 0.55rem;
+	}
+
+	.pixel-btn--md {
+		padding: 0.85rem 1.5rem;
+		font-size: 0.7rem;
+	}
+
+	.pixel-btn--lg {
+		padding: 1.1rem 2rem;
+		font-size: 0.85rem;
+	}
+}

@@ -1,0 +1,12 @@
+/* ============================================================
+   Card — .pixel-box (компонент Card.svelte)
+   ============================================================ */
+@layer components {
+	/* blocky panel with hard offset shadow */
+	.pixel-box {
+		background-color: var(--color-surface);
+		border: 1px solid var(--color-border);
+		@apply rounded-xs;
+		/* box-shadow: 6px 6px 0 0 #000; */
+	}
+}

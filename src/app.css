@@ -1,0 +1,13 @@
+/* ============================================================
+   ZombieLand survivor — точка сборки стилей.
+   Подключает Tailwind, токены темы, базовые стили и компоненты.
+   Стили отдельных компонентов лежат в src/styles/components/*.
+   ============================================================ */
+@import 'tailwindcss';
+
+@import './styles/theme.css';
+@import './styles/base.css';
+
+@import './styles/components/card.css';
+@import './styles/components/button.css';
+@import './styles/components/prose.css';

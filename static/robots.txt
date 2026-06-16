@@ -1,0 +1,6 @@
+# robots.txt — ZombieLand survivor
+User-agent: *
+Allow: /
+
+# После добавления карты сайта укажите свой домен и раскомментируйте строку:
+# Sitemap: https://zombieland-survivor.ru/sitemap.xml

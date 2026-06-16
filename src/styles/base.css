@@ -1,0 +1,52 @@
+/* ============================================================
+   Base / reset — глобальные элементы документа
+   ============================================================ */
+@layer base {
+	:root {
+		color-scheme: dark;
+	}
+
+	html {
+		background-color: var(--color-bg);
+		color: var(--color-fg);
+		font-family: var(--font-mono);
+	}
+
+	body {
+		min-height: 100vh;
+		/* faint scanline / grid texture for the retro feel */
+		background-image:
+			linear-gradient(rgba(255, 138, 31, 0.03) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(255, 138, 31, 0.03) 1px, transparent 1px);
+		background-size: 32px 32px;
+	}
+
+	::selection {
+		background-color: var(--color-amber);
+		color: var(--color-bg);
+	}
+
+	a {
+		color: var(--color-amber);
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-pixel);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-weight: 400;
+		line-height: 1.45;
+	}
+
+	/* crisp pixel rendering for any imagery */
+	img {
+		image-rendering: pixelated;
+	}
+}
