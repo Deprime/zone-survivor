@@ -13,7 +13,7 @@ export const actions: Actions = {
 		const itemId = String((await request.formData()).get('itemId') ?? '');
 		const result = await buyItem(locals.user, itemId);
 		if (!result.ok) return fail(400, { reason: result.reason });
-		return { traded: 'buy', itemId };
+		return { traded: 'buy', itemId, notices: [result.notice] };
 	},
 
 	sell: async ({ locals, request }) => {
@@ -21,6 +21,6 @@ export const actions: Actions = {
 		const itemId = String((await request.formData()).get('itemId') ?? '');
 		const result = await sellItem(locals.user, itemId);
 		if (!result.ok) return fail(400, { reason: result.reason });
-		return { traded: 'sell', itemId };
+		return { traded: 'sell', itemId, notices: [result.notice] };
 	}
 };

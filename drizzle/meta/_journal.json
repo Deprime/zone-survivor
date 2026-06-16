@@ -8,6 +8,13 @@
 			"when": 1781594910096,
 			"tag": "0000_fixed_wild_pack",
 			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "5",
+			"when": 1781608697136,
+			"tag": "0001_next_korg",
+			"breakpoints": true
 		}
 	]
 }

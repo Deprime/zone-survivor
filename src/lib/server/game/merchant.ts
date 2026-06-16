@@ -4,6 +4,10 @@ import { inventoryItems, users, type User } from '$lib/server/db/schema';
 import { DROP, type DropItemId } from '$lib/constants/drop';
 import { MERCHANT_OPEN_ISO_DAYS } from '$lib/constants/game';
 import { consumeOneItem, countInventory } from './world';
+import { logEvent } from './journal';
+import { ITEM_LABEL } from '$lib/game-messages';
+
+const label = (id: string) => ITEM_LABEL[id] ?? id;
 
 /** Что можно купить и продать у торговца. */
 export const BUYABLE: DropItemId[] = ['ammo', 'antidote'];
@@ -49,7 +53,7 @@ export async function getMerchantState(user: User): Promise<MerchantState> {
 }
 
 export type TradeResult =
-	| { ok: true }
+	| { ok: true; notice: string }
 	| {
 			ok: false;
 			reason:
@@ -84,7 +88,10 @@ export async function buyItem(user: User, itemId: string): Promise<TradeResult> 
 	if ((header?.affectedRows ?? 0) !== 1) return { ok: false, reason: 'no_tokens' };
 
 	await db.insert(inventoryItems).values({ userId: user.id, itemKey: id });
-	return { ok: true };
+
+	const notice = `🛒 Куплен ${label(id)} за ${price} 🪙`;
+	await logEvent(user.id, 'merchant', notice);
+	return { ok: true, notice };
 }
 
 /** Продать предмет за токены. */
@@ -105,5 +112,7 @@ export async function sellItem(user: User, itemId: string): Promise<TradeResult>
 		.set({ tokens: sql`${users.tokens} + ${price}` })
 		.where(eq(users.id, user.id));
 
-	return { ok: true };
+	const notice = `💰 Продан ${label(id)} за ${price} 🪙`;
+	await logEvent(user.id, 'merchant', notice);
+	return { ok: true, notice };
 }

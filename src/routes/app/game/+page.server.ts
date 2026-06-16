@@ -45,7 +45,14 @@ export const actions: Actions = {
 		if (!locals.user) return fail(401, { reason: 'unauthorized' });
 		const result = await pressAlive(locals.user.id);
 		if (!result.ok) return fail(400, { reason: result.reason });
-		return { success: true, x: result.x, y: result.y, event: result.event, threat: result.threat };
+		return {
+			success: true,
+			x: result.x,
+			y: result.y,
+			event: result.event,
+			threat: result.threat,
+			notices: result.notices
+		};
 	},
 
 	// Надпись на надгробии (в окне после гибели).
@@ -55,7 +62,7 @@ export const actions: Actions = {
 		const text = String(form.get('text') ?? '');
 		const ok = await inscribeGrave(locals.user, text);
 		if (!ok) return fail(400, { reason: 'cannot_inscribe' });
-		return { inscribed: true };
+		return { inscribed: true, notices: ['🪦 Надпись на надгробии сохранена'] };
 	},
 
 	// Бесплатное воскрешение «Крестом воскрешения».
@@ -63,6 +70,6 @@ export const actions: Actions = {
 		if (!locals.user) return fail(401, { reason: 'unauthorized' });
 		const result = await resurrectWithCross(locals.user);
 		if (!result.ok) return fail(400, { reason: result.reason });
-		return { revived: true };
+		return { revived: true, notices: [result.notice] };
 	}
 };

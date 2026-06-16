@@ -4,6 +4,7 @@ import { graves, inventoryItems, users, type User } from '$lib/server/db/schema'
 import { GRAVE_INSCRIPTION_MAX, RESURRECTION_WINDOW_SECONDS } from '$lib/constants/game';
 import { MAX_REVIVALS, REVIVAL_PRICES_RUB } from '$lib/constants/pricing';
 import { RESURRECTION_CROSS } from '$lib/constants/drop';
+import { logEvent } from './journal';
 
 export interface DeathInfo {
 	/** В пределах окна (24ч после гибели) — можно действовать. */
@@ -68,6 +69,7 @@ export async function inscribeGrave(user: User, text: string): Promise<boolean> 
 
 	const clean = text.trim().slice(0, GRAVE_INSCRIPTION_MAX);
 	await db.update(graves).set({ inscription: clean }).where(eq(graves.id, grave.id));
+	await logEvent(user.id, 'death', `🪦 Надпись на надгробии: «${clean}»`);
 	return true;
 }
 
@@ -89,7 +91,7 @@ async function revive(userId: number, countAsPaid: boolean): Promise<void> {
 }
 
 export type ReviveResult =
-	| { ok: true }
+	| { ok: true; notice: string }
 	| { ok: false; reason: 'window_closed' | 'no_cross' | 'limit_reached' };
 
 /** Бесплатное воскрешение «Крестом воскрешения» (не тратит платные попытки). */
@@ -105,7 +107,10 @@ export async function resurrectWithCross(user: User): Promise<ReviveResult> {
 
 	await db.delete(inventoryItems).where(eq(inventoryItems.id, cross.id));
 	await revive(user.id, false);
-	return { ok: true };
+
+	const notice = '✝️ Воскрешение Крестом — ты снова в игре';
+	await logEvent(user.id, 'revival', notice);
+	return { ok: true, notice };
 }
 
 /**
@@ -117,7 +122,10 @@ export async function resurrectPaid(user: User): Promise<ReviveResult> {
 	if (user.revivals >= MAX_REVIVALS) return { ok: false, reason: 'limit_reached' };
 
 	await revive(user.id, true);
-	return { ok: true };
+
+	const notice = '💸 Платное воскрешение — ты снова в игре';
+	await logEvent(user.id, 'revival', notice);
+	return { ok: true, notice };
 }
 
 /**
@@ -128,4 +136,5 @@ export async function revivePaidByPayment(userId: number): Promise<void> {
 	const [u] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 	if (!u || u.diedAt === null) return;
 	await revive(userId, true);
+	await logEvent(userId, 'revival', '💸 Платное воскрешение — ты снова в игре');
 }

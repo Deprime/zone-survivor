@@ -11,7 +11,9 @@ import {
 import { countInventory, randomStep, resolveCellEvent, type CellEvent } from './world';
 import { resolveThreat, type ThreatEvent } from './zombie';
 import { getActiveSeason } from './season';
+import { logEvent, logEvents } from './journal';
 import { enqueueNotification } from '$lib/server/notifications/queue';
+import { cellEventMessage, threatMessage } from '$lib/game-messages';
 
 export type AliveStatus = 'ready' | 'cooldown' | 'dead';
 
@@ -46,7 +48,8 @@ export function computeAliveState(user: Pick<User, 'activeAt' | 'diedAt'>): Aliv
  */
 export async function killUser(
 	user: Pick<User, 'id' | 'posX' | 'posY' | 'tokens' | 'chatId'>,
-	diedAt: number
+	diedAt: number,
+	options: { log?: boolean } = {}
 ): Promise<boolean> {
 	const raw = await db
 		.update(users)
@@ -65,6 +68,11 @@ export async function killUser(
 		looted: false
 	});
 
+	// Журнал: для заражения смерть логирует pressAlive (log: false), иначе — таймаут.
+	if (options.log !== false) {
+		await logEvent(user.id, 'death', '☠️ Персонаж погиб — не нажал «Я жив» вовремя');
+	}
+
 	try {
 		await redis.del(aliveKey(user.id), cooldownKey(user.id));
 	} catch {
@@ -77,7 +85,15 @@ export async function killUser(
 }
 
 export type PressResult =
-	| { ok: true; x: number; y: number; tokens: number; event: CellEvent; threat: ThreatEvent }
+	| {
+			ok: true;
+			x: number;
+			y: number;
+			tokens: number;
+			event: CellEvent;
+			threat: ThreatEvent;
+			notices: string[];
+	  }
 	| { ok: false; reason: 'dead' | 'cooldown' | 'expired' };
 
 /**
@@ -143,11 +159,26 @@ export async function pressAlive(userId: number): Promise<PressResult> {
 	}
 	await db.update(users).set(update).where(eq(users.id, userId));
 
-	// Смерть от заражения — фиксируем на новой клетке.
+	// Журнал/тосты: формируем человекочитаемые сообщения по итогам хода.
+	const notices: string[] = [
+		`Отметка «Я жив»: +${TOKENS_PER_PRESS} 🪙`,
+		`Ход на клетку (${next.x}, ${next.y})`
+	];
+	const cellMsg = cellEventMessage(event);
+	if (cellMsg) notices.push(cellMsg);
+	const thrMsg = threatMessage(threatOutcome.threat);
+	if (thrMsg) notices.push(thrMsg);
+	await logEvents(
+		userId,
+		notices.map((m) => ({ type: 'game', message: m }))
+	);
+
+	// Смерть от заражения — фиксируем на новой клетке (death уже в журнале как угроза).
 	if (threatOutcome.death) {
 		await killUser(
 			{ id: userId, posX: next.x, posY: next.y, tokens: finalTokens, chatId: u.chatId },
-			Math.floor(Date.now() / 1000)
+			Math.floor(Date.now() / 1000),
+			{ log: false }
 		);
 	} else {
 		// Уведомление об укусе + отложенные напоминания (с проверкой актуальности в воркере).
@@ -184,6 +215,7 @@ export async function pressAlive(userId: number): Promise<PressResult> {
 		y: next.y,
 		tokens: finalTokens,
 		event,
-		threat: threatOutcome.threat
+		threat: threatOutcome.threat,
+		notices
 	};
 }

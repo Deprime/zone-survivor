@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from './db';
 import { users, type User } from './db/schema';
+import { COOLDOWN_SECONDS } from '$lib/constants/game';
 
 export function getUserById(id: number): Promise<User | undefined> {
 	return db
@@ -45,7 +46,8 @@ export async function createUser(input: RegisterInput): Promise<User> {
 		chatId: input.chatId,
 		username: input.username,
 		parentId: input.parentId,
-		activeAt: nowSec
+		// Регистрация считается «нажатием» на величину кулдауна назад — кнопка доступна сразу.
+		activeAt: nowSec - COOLDOWN_SECONDS
 	});
 
 	const created = await getUserByTelegramId(input.telegramId);

@@ -1,9 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { env } from '$env/dynamic/public';
 	import Card from '$lib/components/ui/Card.svelte';
-	import { GRAVE_INSCRIPTION_MAX, MAP_SIZE, MAP_VIEW_RADIUS } from '$lib/constants/game';
+	import {
+		COOLDOWN_SECONDS,
+		GRAVE_INSCRIPTION_MAX,
+		MAP_SIZE,
+		MAP_VIEW_RADIUS
+	} from '$lib/constants/game';
 
 	let { data, form } = $props();
+
+	// Диплинк на бота для подключения уведомлений.
+	const botUsername = (env.PUBLIC_TELEGRAM_BOT_USERNAME ?? '').trim().replace(/^@/, '');
+	const botUrl = botUsername ? `https://t.me/${botUsername}?start=connect` : '';
 
 	let submitting = $state(false);
 
@@ -26,6 +36,15 @@
 	const toReady = $derived(Math.max(0, data.alive.nextActiveAt - nowSec));
 	const toDeath = $derived(Math.max(0, data.alive.diesAt - nowSec));
 
+	// Прогресс заполнения кнопки: доля прошедшего кулдауна (0..1).
+	const progress = $derived(
+		status === 'ready'
+			? 1
+			: status === 'cooldown'
+				? Math.min(1, Math.max(0, (COOLDOWN_SECONDS - toReady) / COOLDOWN_SECONDS))
+				: 0
+	);
+
 	const pad = (n: number) => String(n).padStart(2, '0');
 	const fmt = (s: number) =>
 		`${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
@@ -46,46 +65,6 @@
 			});
 		})
 	);
-
-	// --- описание события после хода ---
-	type EventLike = { type: string; amount?: number; itemId?: string };
-	const ITEM_LABEL: Record<string, string> = {
-		ammo: 'патрон',
-		antidote: 'антидот',
-		loot: 'лут'
-	};
-	function eventText(e: EventLike): string {
-		switch (e.type) {
-			case 'tokens':
-				return `Ящик с токенами: +${e.amount} 🪙`;
-			case 'grave':
-				return `Разграблена могила: +${e.amount} 🪙`;
-			case 'item':
-				return `Найден предмет: ${ITEM_LABEL[e.itemId ?? ''] ?? e.itemId}`;
-			case 'item_lost':
-				return `Найден ${ITEM_LABEL[e.itemId ?? ''] ?? e.itemId}, но инвентарь полон`;
-			default:
-				return 'Клетка пуста';
-		}
-	}
-
-	type ThreatLike = { type: string; movesLeft?: number };
-	function threatText(t: ThreatLike): string | null {
-		switch (t.type) {
-			case 'zombie_killed':
-				return '🧟 Зомби! Ты отстрелялся патроном — без последствий.';
-			case 'zombie_bite':
-				return `🧟 Зомби укусил! Ты заражён — найди антидот за ${t.movesLeft} хода.`;
-			case 'infection_cured':
-				return '💉 Антидот применён — заражение вылечено.';
-			case 'infection_progress':
-				return `☣️ Заражение прогрессирует. До гибели: ${t.movesLeft} хода.`;
-			case 'infection_death':
-				return '☠️ Антидот не найден — персонаж умер от заражения.';
-			default:
-				return null;
-		}
-	}
 </script>
 
 <svelte:head>
@@ -218,34 +197,53 @@
 		>
 			<button
 				type="submit"
-				class="pixel-btn pixel-btn--solid pixel-btn--lg disabled:cursor-not-allowed disabled:opacity-40"
 				disabled={status !== 'ready' || submitting}
+				class="font-pixel relative mx-auto block w-full max-w-[16rem] overflow-hidden border-2 px-8 py-4 uppercase transition-shadow
+					{status === 'ready'
+					? 'border-cyan text-bg shadow-[0_0_22px_rgba(52,200,192,0.45)]'
+					: 'border-border text-fg cursor-not-allowed'}"
 			>
-				Я жив
+				<!-- прогресс-заполнение снизу вверх -->
+				{#if status === 'ready'}
+					<span class="bg-cyan absolute inset-0" aria-hidden="true"></span>
+				{:else if status === 'cooldown'}
+					<span
+						class="bg-cyan/25 absolute inset-x-0 bottom-0 transition-[height] duration-1000 ease-linear"
+						style="height: {progress * 100}%"
+						aria-hidden="true"
+					></span>
+				{/if}
+
+				<!-- контент поверх заливки -->
+				<span class="relative z-10 block text-base leading-none">Я жив</span>
+				{#if status === 'cooldown'}
+					<span class="text-muted relative z-10 mt-1 block text-[0.6rem] leading-none tabular-nums">
+						{fmt(toReady)}
+					</span>
+				{/if}
 			</button>
 		</form>
 
-		<div class="text-muted mt-6 text-xs">
-			{#if status === 'cooldown'}
-				<p>Кнопка активируется через <span class="text-cyan tabular-nums">{fmt(toReady)}</span></p>
-			{:else}
-				<p class="text-amber">Кнопка активна — жми!</p>
-			{/if}
-			<p class="mt-1">
-				Персонаж погибнет через <span class="text-danger tabular-nums">{fmt(toDeath)}</span>
-			</p>
-		</div>
+		<p class="text-muted mt-5 text-xs">
+			Персонаж погибнет через <span class="text-danger tabular-nums">{fmt(toDeath)}</span>
+		</p>
 
-		{#if form && 'event' in form}
-			<p class="border-border text-fg mx-auto mt-4 max-w-sm border-2 px-3 py-2 text-xs">
-				Ход на {form.x},{form.y}: {eventText(form.event)}
-			</p>
-			{#if threatText(form.threat)}
-				<p class="border-danger text-danger mx-auto mt-2 max-w-sm border-2 px-3 py-2 text-xs">
-					{threatText(form.threat)}
-				</p>
-			{/if}
-		{:else if form && 'reason' in form && form.reason === 'cooldown'}
+		{#if botUrl}
+			<a
+				href={botUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="border-cyan text-fg hover:bg-cyan/10 mx-auto mt-5 flex max-w-sm items-center gap-2 border-2 px-3 py-2 text-xs no-underline transition-colors"
+			>
+				<span class="text-lg" aria-hidden="true">🤖</span>
+				<span>
+					Без бота легко проспать ход и погибнуть.
+					<span class="text-cyan font-bold">Подключить →</span>
+				</span>
+			</a>
+		{/if}
+
+		{#if form && 'reason' in form && form.reason === 'cooldown'}
 			<p class="text-danger mt-4 text-xs">Ещё рано — кнопка на кулдауне.</p>
 		{:else if form && 'reason' in form && form.reason === 'expired'}
 			<p class="text-danger mt-4 text-xs">Слишком поздно — персонаж погиб.</p>

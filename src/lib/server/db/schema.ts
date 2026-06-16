@@ -185,3 +185,23 @@ export const payments = mysqlTable(
 
 export type Payment = typeof payments.$inferSelect;
 export type NewPayment = typeof payments.$inferInsert;
+
+/**
+ * Игровой журнал событий пользователя (действия игрока и системные события).
+ */
+export const eventLog = mysqlTable(
+	'event_log',
+	{
+		id: int('id', { unsigned: true }).autoincrement().primaryKey(),
+		userId: int('user_id', { unsigned: true })
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		// Тип события для фильтрации/локализации (game, merchant, death, revival, …).
+		type: varchar('type', { length: 32 }).notNull(),
+		message: varchar('message', { length: 255 }).notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(t) => [index('idx_event_log_user_id').on(t.userId)]
+);
+
+export type EventLogEntry = typeof eventLog.$inferSelect;
