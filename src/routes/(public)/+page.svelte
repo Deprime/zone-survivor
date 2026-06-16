@@ -5,6 +5,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	// import Logo from '$lib/components/ui/Logo.svelte'; // резервный вариант логотипа
 	import LogoChrome from '$lib/components/ui/LogoChrome.svelte';
+	import ItemIcon from '$lib/components/shared/ItemIcon.svelte';
 	import { MAX_REFERRALS, TOKENS_PER_REFERRAL, REFERRAL_REWARD } from '$lib/constants/referral';
 	// import { REVIVAL_PRICES_RUB, MAX_REVIVALS, CURRENCY } from '$lib/constants/pricing';
 	// const revivalPrices = REVIVAL_PRICES_RUB.map((price) => `${price} ${CURRENCY}`).join(' / ');
@@ -231,7 +232,7 @@
 	<div
 		class="border-amber bg-amber/5 mx-auto flex max-w-md items-center gap-4 border-2 p-4 text-left shadow-[0_0_18px_rgba(255,138,31,0.25)]"
 	>
-		<span class="text-4xl" aria-hidden="true">✝️</span>
+		<ItemIcon itemKey="resurrection_cross" size={48} class="shrink-0" />
 		<div>
 			<div class="text-amber text-xs font-bold tracking-widest uppercase">
 				{MAX_REFERRALS} друзей — награда

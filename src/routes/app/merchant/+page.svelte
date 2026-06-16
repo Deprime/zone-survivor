@@ -1,13 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Card from '$lib/components/ui/Card.svelte';
+	import ExpandInventoryButton from '$lib/components/shared/ExpandInventoryButton.svelte';
+	import ItemIcon from '$lib/components/shared/ItemIcon.svelte';
+	import { MAX_INVENTORY_SIZE } from '$lib/constants/pricing';
 
 	let { data, form } = $props();
 
-	const ITEM: Record<string, { icon: string; name: string }> = {
-		ammo: { icon: '🔫', name: 'Патрон' },
-		antidote: { icon: '💉', name: 'Антидот' },
-		loot: { icon: '📦', name: 'Лут' }
+	const ITEM_NAME: Record<string, string> = {
+		ammo: 'Патрон',
+		antidote: 'Антидот',
+		loot: 'Лут'
 	};
 
 	const reasonText: Record<string, string> = {
@@ -44,9 +47,9 @@
 	<div class="mb-8 grid gap-3 sm:grid-cols-2">
 		{#each data.merchant.buy as item (item.id)}
 			<div class="border-border flex items-center justify-between border-2 px-3 py-2">
-				<span class="text-fg text-sm">
-					<span aria-hidden="true">{ITEM[item.id]?.icon}</span>
-					{ITEM[item.id]?.name ?? item.id}
+				<span class="text-fg flex items-center gap-2 text-sm">
+					<ItemIcon itemKey={item.id} size={28} />
+					{ITEM_NAME[item.id] ?? item.id}
 				</span>
 				<form method="POST" action="?/buy" use:enhance>
 					<input type="hidden" name="itemId" value={item.id} />
@@ -67,9 +70,9 @@
 	<div class="mb-8 grid gap-3 sm:grid-cols-2">
 		{#each data.merchant.sell as item (item.id)}
 			<div class="border-border flex items-center justify-between border-2 px-3 py-2">
-				<span class="text-fg text-sm">
-					<span aria-hidden="true">{ITEM[item.id]?.icon}</span>
-					{ITEM[item.id]?.name ?? item.id}
+				<span class="text-fg flex items-center gap-2 text-sm">
+					<ItemIcon itemKey={item.id} size={28} />
+					{ITEM_NAME[item.id] ?? item.id}
 					<span class="text-muted">× {item.count}</span>
 				</span>
 				<form method="POST" action="?/sell" use:enhance>
@@ -88,11 +91,11 @@
 
 	<!-- ПЛАТНАЯ УСЛУГА -->
 	<h2 class="text-amber mb-3 text-sm uppercase">Платные услуги</h2>
-	<div class="border-cyan flex items-center justify-between border-2 px-3 py-2">
-		<span class="text-fg text-sm">
-			🎒 Расширить инвентарь (+1 клетка)
-			<span class="text-muted">сейчас {data.merchant.inventorySize}</span>
-		</span>
-		<a href="/app/pay?for=inventory" class="pixel-btn pixel-btn--solid pixel-btn--sm">Купить</a>
-	</div>
+	{#if data.merchant.inventorySize < MAX_INVENTORY_SIZE}
+		<ExpandInventoryButton currentSize={data.merchant.inventorySize} />
+	{:else}
+		<p class="border-border text-muted border-2 px-3 py-2 text-sm">
+			🎒 Инвентарь расширен до максимума ({MAX_INVENTORY_SIZE} клеток).
+		</p>
+	{/if}
 </Card>

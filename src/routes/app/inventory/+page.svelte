@@ -1,15 +1,9 @@
 <script lang="ts">
 	import Card from '$lib/components/ui/Card.svelte';
+	import ExpandInventoryButton from '$lib/components/shared/ExpandInventoryButton.svelte';
+	import ItemIcon from '$lib/components/shared/ItemIcon.svelte';
 
 	let { data } = $props();
-
-	// Презентационные иконки (до подключения локализации).
-	const ICONS: Record<string, string> = {
-		ammo: '🔫',
-		antidote: '💉',
-		loot: '📦',
-		resurrection_cross: '✝️'
-	};
 
 	// Клеток не меньше размера инвентаря и не меньше числа предметов.
 	const totalCells = $derived(Math.max(data.user.inventorySize, data.items.length));
@@ -29,12 +23,15 @@
 	<div class="grid grid-cols-4 gap-3 sm:grid-cols-6">
 		{#each cells as item, i (i)}
 			<div
-				class="border-border bg-bg flex aspect-square items-center justify-center border-2 text-2xl
-					{item ? 'text-fg' : 'text-muted'}"
+				class="border-border bg-bg text-muted flex aspect-square items-center justify-center border-2 text-2xl"
 				title={item?.itemKey ?? 'Пустая клетка'}
 				aria-label={item?.itemKey ?? 'Пустая клетка'}
 			>
-				{item ? (ICONS[item.itemKey] ?? '❔') : '·'}
+				{#if item}
+					<ItemIcon itemKey={item.itemKey} size={48} class="h-3/4 w-3/4" />
+				{:else}
+					·
+				{/if}
 			</div>
 		{/each}
 	</div>
@@ -44,4 +41,7 @@
 			✝️ Крест воскрешения — уникальный предмет за 10 рефералов: один раз воскрешает после гибели.
 		</p>
 	{/if}
+
+	<!-- Кнопка расширения появляется, только если есть доступные расширения. -->
+	<ExpandInventoryButton currentSize={data.user.inventorySize} class="mt-6" />
 </Card>
